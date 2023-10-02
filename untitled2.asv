@@ -1,0 +1,232 @@
+function varargout = untitled2(varargin)
+% UNTITLED2 MATLAB code for untitled2.fig
+%      UNTITLED2, by itself, creates a new UNTITLED2 or raises the existing
+%      singleton*.
+%
+%      H = UNTITLED2 returns the handle to a new UNTITLED2 or the handle to
+%      the existing singleton*.
+%
+%      UNTITLED2('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in UNTITLED2.M with the given input arguments.
+%
+%      UNTITLED2('Property','Value',...) creates a new UNTITLED2 or raises the
+%      existing singleton*.  Starting from the left, property value pairs are
+%      applied to the GUI before untitled2_OpeningFcn gets called.  An
+%      unrecognized property name or invalid value makes property application
+%      stop.  All inputs are passed to untitled2_OpeningFcn via varargin.
+%
+%      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
+%      instance to run (singleton)".
+%
+% See also: GUIDE, GUIDATA, GUIHANDLES
+
+% Edit the above text to modify the response to help untitled2
+
+% Last Modified by GUIDE v2.5 02-Oct-2023 19:28:10
+
+% Begin initialization code - DO NOT EDIT
+gui_Singleton = 1;
+gui_State = struct('gui_Name',       mfilename, ...
+                   'gui_Singleton',  gui_Singleton, ...
+                   'gui_OpeningFcn', @untitled2_OpeningFcn, ...
+                   'gui_OutputFcn',  @untitled2_OutputFcn, ...
+                   'gui_LayoutFcn',  [] , ...
+                   'gui_Callback',   []);
+if nargin && ischar(varargin{1})
+    gui_State.gui_Callback = str2func(varargin{1});
+end
+
+if nargout
+    [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
+else
+    gui_mainfcn(gui_State, varargin{:});
+end
+% End initialization code - DO NOT EDIT
+
+
+% --- Executes just before untitled2 is made visible.
+function untitled2_OpeningFcn(hObject, eventdata, handles, varargin)
+% This function has no output args, see OutputFcn.
+% hObject    handle to figure
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+% varargin   command line arguments to untitled2 (see VARARGIN)
+
+% Choose default command line output for untitled2
+handles.output = hObject;
+
+% Update handles structure
+guidata(hObject, handles);
+
+% UIWAIT makes untitled2 wait for user response (see UIRESUME)
+% uiwait(handles.figure1);
+
+
+% --- Outputs from this function are returned to the command line.
+function varargout = untitled2_OutputFcn(hObject, eventdata, handles) 
+% varargout  cell array for returning output args (see VARARGOUT);
+% hObject    handle to figure
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Get default command line output from handles structure
+varargout{1} = handles.output;
+
+
+% --- Executes on button press in pushbutton1.
+function pushbutton1_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+% hObject    handle to Start_Webcam (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global c;
+global loopFlag;
+loopFlag = true;
+c=webcam;%For the webcam
+ while true
+     if(loopFlag ==false)%continue until the loopFlag becomes false
+         break;
+     else
+    e=c.snapshot;%Take a picture with the webcam and put it in a special box called 'e'.
+     axes(handles.axes1);%"Get ready to put a picture in a special box called 'axes1' which is like a frame for showing pictures."
+     
+ imshow(e);%Show the picture we just took in the 'axes1' box.
+ drawnow;%Show the picture we just took in the 'axes1' box.
+     end
+ end
+
+
+% --- Executes on button press in pushbutton2.
+function pushbutton2_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+FDetect=vision.CascadeObjectDetector;
+FDetect.MergeThreshold=50;
+global loopFlag;
+global c ;
+while true
+     if(loopFlag ==false)
+         break;
+     else
+    e=c.snapshot;
+    BB=step(FDetect,e);
+    imshow(e);
+    hold on;
+    for i=1:size(BB,1)
+      rectangle('Position',BB(i,:),'Linewidth',2,'LineStyle','-','EdgeColor','g');
+      title('Face Detection');
+    end
+    hold off;
+    drawnow;
+    end
+end
+
+
+% --- Executes on button press in pushbutton3.
+function pushbutton3_Callback(hObject, eventdata, handles)
+% hObject    handle to Eye_Detection (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+clc
+clear all
+close all;
+c=webcam;
+while true
+    
+e=c.snapshot;
+FDetect=vision.CascadeObjectDetector('EyePairBig');
+FDetect.MinSize=[11 45];
+FDetect.MergeThreshold=50;
+I=e;
+BB_Mouth=step(FDetect,I);
+imshow(I);
+if(sum(sum(BB_Mouth))==0)
+hold on;
+title('Eyes Closed');
+ defaultString = 'Please open your eyes';
+NET.addAssembly('System.Speech');
+obj = System.Speech.Synthesis.SpeechSynthesizer;
+obj.Volume = 100;
+Speak(obj, defaultString);
+else
+title('Eyes Open');
+for i=1:size(BB_Mouth,1)
+rectangle('Position',BB_Mouth(i,:),'Linewidth',2,'LineStyle','-','EdgeColor','c');
+end
+end
+end
+
+% --- Executes on button press in pushbutton4.
+function pushbutton4_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton4 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global loopFlag;
+global c ;
+FDetect=vision.CascadeObjectDetector('Nose');
+FDetect.MinSize=[15 18];
+FDetect.MergeThreshold=70;
+while true
+     if(loopFlag ==false)
+         break;
+     else
+    e=c.snapshot;
+    BB=step(FDetect,e);
+    imshow(e);
+    hold on;
+    for i=1:size(BB,1)
+rectangle('Position',BB(i,:),'Linewidth',2,'LineStyle','-','EdgeColor','y');
+title('Nose Detection');
+end
+hold off;
+    drawnow;
+    
+     end
+end
+
+
+% --- Executes on button press in pushbutton5.
+function pushbutton5_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton5 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global loopFlag;
+loopFlag=false;
+clear global c;
+axes(handles.axes1);
+title("Camera Closed")
+imshow('thank you.jpg');
+
+
+% --- Executes on button press in pushbutton6.
+function pushbutton6_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton6 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global loopFlag;
+global c ;
+FDetect=vision.CascadeObjectDetector('Mouth');
+
+FDetect.MergeThreshold=110;
+while true
+     if(loopFlag ==false)
+         break;
+     else
+    e=c.snapshot;
+    BB=step(FDetect,e);
+    imshow(e);
+    hold on;
+    for i=1:size(BB,1)
+rectangle('Position',BB(i,:),'Linewidth',2,'LineStyle','-','EdgeColor','m');
+title('Mouth Detection');
+end
+hold off;
+    drawnow;
+    
+     end
+end
