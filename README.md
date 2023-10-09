@@ -2,6 +2,10 @@
 
 This repository contains a MATLAB GUI application that uses image processing techniques to detect and track facial features such as eyes, mouth, and nose. The app is capable of detecting eye open/close events and providing alerts when the eyes are closed.
 
+
+
+
+
 ## Features
 
 - **Face Detection**: The application uses a pre-trained model to detect and locate faces in the input image or video stream.
